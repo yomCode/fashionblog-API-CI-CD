@@ -6,14 +6,18 @@ import com.aimcodes.fashionBlog.entities.User;
 import com.aimcodes.fashionBlog.enums.Role;
 import com.aimcodes.fashionBlog.pojos.ApiResponse;
 import com.aimcodes.fashionBlog.pojos.CommentRequestDto;
+import com.aimcodes.fashionBlog.pojos.CommentResponseDto;
 import com.aimcodes.fashionBlog.repositories.CommentRepository;
 import com.aimcodes.fashionBlog.repositories.PostRepository;
 import com.aimcodes.fashionBlog.services.CommentService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +31,7 @@ public class CommentServiceImpl implements CommentService {
     private final ResponseManager responseManager;
 
     @Override
-    public ApiResponse create_comment(CommentRequestDto request, Long post_id, HttpSession session){
+    public ResponseEntity<ApiResponse> create_comment(CommentRequestDto request, Long post_id, HttpSession session){
         User user = (User) session.getAttribute("currUser");
         Post post = postRepository.findById(post_id).orElse(null);
 
@@ -37,18 +41,26 @@ public class CommentServiceImpl implements CommentService {
             comment.setContent(request.getContent());
             comment.setComment_author(user.getUsername());
             comment.setPost(post);
-
             commentRepository.save(comment);
-            return responseManager.successfulRequest(comment);
+
+            CommentResponseDto response = new CommentResponseDto();
+            response.setContent(comment.getContent());
+            response.setAuthor(comment.getComment_author());
+
+            return new ResponseEntity<>(responseManager.successfulRequest(comment), HttpStatus.ACCEPTED);
 
         }else if(user == null && request.getComment_author() != null){
             Comment comment = new Comment();
             comment.setContent(request.getContent());
             comment.setComment_author(request.getComment_author());
             comment.setPost(post);
-
             commentRepository.save(comment);
-            return responseManager.successfulRequest(comment);
+
+            CommentResponseDto response = new CommentResponseDto();
+            response.setContent(comment.getContent());
+            response.setAuthor(comment.getComment_author());
+
+            return new ResponseEntity<>(responseManager.successfulRequest(comment), HttpStatus.ACCEPTED);
 
         }
 
@@ -56,39 +68,58 @@ public class CommentServiceImpl implements CommentService {
         comment.setContent(request.getContent());
         comment.setComment_author("Anonymous");
         comment.setPost(post);
-
         commentRepository.save(comment);
-        return responseManager.successfulRequest(comment);
 
+        CommentResponseDto response = new CommentResponseDto();
+        response.setContent(comment.getContent());
+        response.setAuthor(comment.getComment_author());
+
+        return new ResponseEntity<>(responseManager.successfulRequest(comment), HttpStatus.ACCEPTED);
     }
 
 
     @Override
-    public ApiResponse deleteComment(Long comment_id, HttpSession session){
+    public ResponseEntity<ApiResponse> deleteComment(Long comment_id, HttpSession session){
         User user = (User) session.getAttribute("currUser");
         Comment comment = commentRepository.findById(comment_id).orElse(null);
 
         if(user.getId().equals(comment.getUser().getId()) || user.getRole().equals(Role.valueOf("ADMIN"))){
             commentRepository.delete(comment);
-            return responseManager.successfulRequest("comment deleted successfully!");
+
+
+            return new ResponseEntity<>(responseManager.successfulRequest("comment deleted successfully!"), HttpStatus.ACCEPTED);
         }
         return null;
     }
 
 
     @Override
-    public ApiResponse view_comment(Long comment_id){
+    public ResponseEntity<ApiResponse> view_comment(Long comment_id){
         Comment comment = commentRepository.findById(comment_id).orElse(null);
-        return responseManager.successfulRequest(comment);
+
+        CommentResponseDto response = new CommentResponseDto();
+        assert comment != null;
+        response.setContent(comment.getContent());
+        response.setAuthor(comment.getComment_author());
+        return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.FOUND);
 
     }
 
 
     @Override
-    public List<Comment> view_all_comments(Long post_id){
+    public ResponseEntity<ApiResponse> view_all_comments(Long post_id){
         Post post = postRepository.findById(post_id).orElse(null);
 
-        return post.getComments();
+        List<Comment> comments = post.getComments();
+        List<CommentResponseDto> responses = new ArrayList<>();
+        comments.forEach(comment ->{
+            CommentResponseDto response = new CommentResponseDto();
+            response.setContent(comment.getContent());
+            response.setAuthor(comment.getComment_author());
+            responses.add(response);
+
+        });
+        return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.FOUND);
     }
 
 }

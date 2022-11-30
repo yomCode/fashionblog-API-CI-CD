@@ -19,21 +19,21 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public ApiResponse newUser(@RequestBody UserRequestDto request){
+    public ResponseEntity<ApiResponse> newUser(@RequestBody UserRequestDto request){
 
         return userService.createUser(request);
 
     }
 
     @PostMapping("/login")
-    public ApiResponse login(@RequestBody UserRequestDto request, HttpSession session){
+    public ResponseEntity<ApiResponse> login(@RequestBody UserRequestDto request, HttpSession session){
 
         return userService.userLogin(request, session);
     }
 
 
     @GetMapping("/logout")
-    public ApiResponse user_logout(HttpSession session){
+    public ResponseEntity<ApiResponse> user_logout(HttpSession session){
         return userService.logout(session);
     }
 }

@@ -17,8 +17,11 @@ import java.util.Set;
 @ToString
 public class User extends BaseEntity{
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Role", nullable = false)

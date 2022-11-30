@@ -5,17 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRequestDto {
+@Data
+public class UserResponseDto {
 
-//    @NotBlank(message = "username is required")
-    private String username;
-
+    private Long user_id;
+    private String Username;
     private String email;
-
-//    @NotBlank(message = "password is required")
-    private String password;
 
 }
