@@ -31,6 +31,6 @@ public class User extends BaseEntity{
     private String password;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
     private List<Post> posts;
 }

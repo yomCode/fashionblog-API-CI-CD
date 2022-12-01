@@ -25,7 +25,7 @@ public class PostController {
         return postService.createPost(request, session);
     }
 
-    @PatchMapping("/edit/{post_id}")
+    @PutMapping("/edit/{post_id}")
     public ResponseEntity<ApiResponse> edit_post(@RequestBody PostRequestDto request, @PathVariable Long post_id, HttpSession session){
 
         return postService.edit_post(request, post_id, session);

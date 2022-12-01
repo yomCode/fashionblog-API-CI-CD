@@ -2,6 +2,7 @@ package com.aimcodes.fashionBlog.services.serviceImpl;
 
 import com.aimcodes.fashionBlog.entities.User;
 import com.aimcodes.fashionBlog.enums.Role;
+import com.aimcodes.fashionBlog.exceptions.HandleNullException;
 import com.aimcodes.fashionBlog.pojos.ApiResponse;
 import com.aimcodes.fashionBlog.pojos.UserRequestDto;
 import com.aimcodes.fashionBlog.pojos.UserResponseDto;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.Errors;
 
 import javax.servlet.http.HttpSession;
 
@@ -54,11 +56,9 @@ public class UserServiceImpl implements UserService {
             response.setEmail(user.getEmail());
             response.setUsername(user.getUsername());
 
-
             return new ResponseEntity<>(new ResponseManager().successfulRequest(response), HttpStatus.OK) ;
         }
-
-        return new ResponseEntity<>(new ResponseManager().failedRequest(), HttpStatus.BAD_REQUEST);
+        throw new HandleNullException("wrong email or password", "No user found for this details");
     }
 
     @Override

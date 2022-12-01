@@ -12,5 +12,6 @@ public class CommentResponseDto {
 
     private String content;
     private String author;
+    private Integer likes;
 
 }

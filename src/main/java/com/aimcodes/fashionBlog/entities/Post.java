@@ -24,7 +24,7 @@ public class Post extends BaseEntity implements Serializable {
 //    private byte[] image
 
     @JsonIgnore
-    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Comment> comments;
 
     @ManyToOne
@@ -34,6 +34,5 @@ public class Post extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "post_category", nullable = false)
     private Category category;
-
 
 }

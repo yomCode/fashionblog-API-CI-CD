@@ -6,7 +6,6 @@ import com.aimcodes.fashionBlog.enums.Role;
 import com.aimcodes.fashionBlog.pojos.ApiResponse;
 import com.aimcodes.fashionBlog.pojos.CategoryRequestDto;
 import com.aimcodes.fashionBlog.pojos.CategoryResponseDto;
-import com.aimcodes.fashionBlog.pojos.CommentResponseDto;
 import com.aimcodes.fashionBlog.repositories.CategoryRepository;
 import com.aimcodes.fashionBlog.services.CategoryService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;

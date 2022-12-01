@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
 @Service
@@ -47,7 +46,7 @@ public class CommentServiceImpl implements CommentService {
             response.setContent(comment.getContent());
             response.setAuthor(comment.getComment_author());
 
-            return new ResponseEntity<>(responseManager.successfulRequest(comment), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
 
         }else if(user == null && request.getComment_author() != null){
             Comment comment = new Comment();
@@ -60,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
             response.setContent(comment.getContent());
             response.setAuthor(comment.getComment_author());
 
-            return new ResponseEntity<>(responseManager.successfulRequest(comment), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
 
         }
 
@@ -74,7 +73,7 @@ public class CommentServiceImpl implements CommentService {
         response.setContent(comment.getContent());
         response.setAuthor(comment.getComment_author());
 
-        return new ResponseEntity<>(responseManager.successfulRequest(comment), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
     }
 
 
@@ -85,7 +84,6 @@ public class CommentServiceImpl implements CommentService {
 
         if(user.getId().equals(comment.getUser().getId()) || user.getRole().equals(Role.valueOf("ADMIN"))){
             commentRepository.delete(comment);
-
 
             return new ResponseEntity<>(responseManager.successfulRequest("comment deleted successfully!"), HttpStatus.ACCEPTED);
         }
@@ -101,8 +99,8 @@ public class CommentServiceImpl implements CommentService {
         assert comment != null;
         response.setContent(comment.getContent());
         response.setAuthor(comment.getComment_author());
+        response.setLikes(comment.getLikes().size());
         return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.FOUND);
-
     }
 
 
@@ -116,6 +114,7 @@ public class CommentServiceImpl implements CommentService {
             CommentResponseDto response = new CommentResponseDto();
             response.setContent(comment.getContent());
             response.setAuthor(comment.getComment_author());
+            response.setLikes(comment.getLikes().size());
             responses.add(response);
 
         });

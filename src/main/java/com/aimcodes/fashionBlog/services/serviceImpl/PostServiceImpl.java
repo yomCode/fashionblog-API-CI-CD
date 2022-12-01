@@ -4,6 +4,9 @@ import com.aimcodes.fashionBlog.entities.Category;
 import com.aimcodes.fashionBlog.entities.Post;
 import com.aimcodes.fashionBlog.entities.User;
 import com.aimcodes.fashionBlog.enums.Role;
+import com.aimcodes.fashionBlog.exceptions.HandleNullException;
+import com.aimcodes.fashionBlog.exceptions.NoAccessException;
+import com.aimcodes.fashionBlog.exceptions.NoDataFoundException;
 import com.aimcodes.fashionBlog.pojos.ApiResponse;
 import com.aimcodes.fashionBlog.pojos.PostRequestDto;
 import com.aimcodes.fashionBlog.pojos.PostResponseDto;
@@ -12,6 +15,7 @@ import com.aimcodes.fashionBlog.repositories.PostRepository;
 import com.aimcodes.fashionBlog.services.PostService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
+    private final ModelMapper modelMapper;
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final ResponseManager responseManager;
@@ -32,9 +37,10 @@ public class PostServiceImpl implements PostService {
     @Override
     public ResponseEntity<ApiResponse> createPost(PostRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("currUser");
-        if(user.getRole().equals(Role.valueOf("ADMIN"))){
+        if (user.getRole().equals(Role.valueOf("ADMIN"))) {
             Category category = categoryRepository.findByName(request.getCategory().toLowerCase());
 
+//            Post post = modelMapper.map(request, Post.class);
             Post post = new Post();
             post.setTitle(request.getTitle());
             post.setContent(request.getContent());
@@ -42,68 +48,70 @@ public class PostServiceImpl implements PostService {
             post.setUser(user);
             postRepository.save(post);
 
+//            PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
             PostResponseDto response = new PostResponseDto();
             response.setTitle(post.getTitle());
             response.setContent(post.getContent());
-            response.setCategory(post.getCategory().getName());
             response.setCreated_date(post.getCreatedAt());
+            response.setCategory(post.getCategory().getName());
 
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.CREATED);
         }
-        return null;
+        throw new NoAccessException("Unauthorized user", "User doesnt have the right to create a post!");
     }
 
 
     @Override
-    public ResponseEntity<ApiResponse> edit_post(PostRequestDto request, Long post_id, HttpSession session){
+    public ResponseEntity<ApiResponse> edit_post(PostRequestDto request, Long post_id, HttpSession session) {
 
         User user = (User) session.getAttribute("currUser");
-        if(user.getRole().equals(Role.valueOf("ADMIN"))){
+        if (user != null && user.getRole().equals(Role.valueOf("ADMIN"))) {
             Post post = postRepository.findById(post_id).orElseThrow(null);
-            Category category = categoryRepository.findByName(request.getCategory());
+
+            if(post != null)
             post.setTitle(request.getTitle());
             post.setContent(request.getContent());
-            post.setCategory(category);
             postRepository.save(post);
 
             PostResponseDto response = new PostResponseDto();
             response.setTitle(post.getTitle());
             response.setContent(post.getContent());
+            response.setCreated_date(post.getCreatedAt());
             response.setCategory(post.getCategory().getName());
 
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
-        }
-        return null;
+        }else if(user == null)
+            throw new HandleNullException("Login to edit post", "No user is in session");
+        throw new NoAccessException("Unauthorized user", "User doesnt have the right to edit this post!");
     }
-
 
     @Override
     public ResponseEntity<ApiResponse> delete_Post(Long post_id, HttpSession session){
         User user = (User) session.getAttribute("currUser");
-        if(user.getRole().equals(Role.valueOf("ADMIN"))){
-
-            Post post = postRepository.findById(post_id).orElseThrow(null);
+        if(user != null && user.getRole().equals(Role.valueOf("ADMIN"))){
+            Post post = postRepository.findById(post_id).get();
             postRepository.delete(post);
 
-            return new ResponseEntity<>(responseManager.successfulRequest("Post deleted successfully!"), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(
+                    responseManager.successfulRequest("Post deleted successfully!"),
+                    HttpStatus.ACCEPTED
+            );
         }
-        return null;
+        throw new NoAccessException("Unauthorized user", "User doesnt have the right to delete this post!");
     }
 
     @Override
     public ResponseEntity<ApiResponse> view_all_post(){
         List<Post> posts = postRepository.findAll();
-
         List<PostResponseDto> responses = new ArrayList<>();
 
         posts.forEach(post -> {
+//            PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
             PostResponseDto response = new PostResponseDto();
             response.setTitle(post.getTitle());
-            response.setContent(post.getContent());
             response.setCategory(post.getCategory().getName());
-            response.setCreated_date(post.getCreatedAt());
+            response.setContent(post.getContent());
             responses.add(response);
-
         });
         return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.ACCEPTED);
     }
@@ -116,15 +124,17 @@ public class PostServiceImpl implements PostService {
             List<Post> posts = category.getPosts();
             List<PostResponseDto> responses = new ArrayList<>();
             posts.forEach(post -> {
+//                PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
                 PostResponseDto response = new PostResponseDto();
                 response.setTitle(post.getTitle());
                 response.setContent(post.getContent());
                 response.setCreated_date(post.getCreatedAt());
+                response.setCategory(post.getCategory().getName());
                 responses.add(response);
             });
             return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.ACCEPTED);
         }
-        return null;
+        throw new NoDataFoundException("No such category", categoryName + " does not exist in the database");
     }
 
 }

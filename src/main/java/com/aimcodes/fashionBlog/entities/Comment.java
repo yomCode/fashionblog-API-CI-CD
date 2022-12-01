@@ -29,6 +29,7 @@ public class Comment extends BaseEntity{
     private Post post;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "comment", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Like> likes;
+
 }
