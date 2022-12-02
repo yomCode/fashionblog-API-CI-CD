@@ -4,6 +4,7 @@ package com.aimcodes.fashionBlog.services.serviceImpl;
 import com.aimcodes.fashionBlog.entities.Comment;
 import com.aimcodes.fashionBlog.entities.Like;
 import com.aimcodes.fashionBlog.entities.User;
+import com.aimcodes.fashionBlog.exceptions.HandleNullException;
 import com.aimcodes.fashionBlog.pojos.ApiResponse;
 import com.aimcodes.fashionBlog.repositories.CommentRepository;
 import com.aimcodes.fashionBlog.repositories.LikeRepository;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
 
@@ -28,15 +28,17 @@ public class LikeServiceImpl implements LikeService {
     public ResponseEntity<ApiResponse> createLike(Long comment_id, HttpSession session){
         User user = (User) session.getAttribute("currUser");
         Comment comment = commentRepository.findById(comment_id).orElse(null);
-        Like like = new Like();
-        like.setComment(comment);
-        if(user != null){
-            like.setUser(user);
-        }
-        likeRepository.save(like);
-        return new ResponseEntity<>(new ResponseManager().successfulRequest(like), HttpStatus.CREATED);
-    }
 
+        if(user != null && comment != null){
+            Like like = Like.builder()
+                    .comment(comment)
+                        .build();
+            likeRepository.save(like);
+            return new ResponseEntity<>(new ResponseManager().successfulRequest(like), HttpStatus.CREATED);
+        } else if (user == null)
+            throw new HandleNullException("Invalid user", "No user in session");
+        throw new HandleNullException("Invalid comment", "Comment with id " + comment_id + " does not exist in database");
+    }
 
     @Override
     public ApiResponse unlike(Long like_id){
