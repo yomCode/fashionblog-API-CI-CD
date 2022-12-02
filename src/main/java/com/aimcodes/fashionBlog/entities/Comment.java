@@ -16,6 +16,10 @@ import java.util.Set;
 @Data
 @Builder
 public class Comment extends BaseEntity{
+
+    @Column(name = "UUID", unique = true)
+    private String uuid;
+
     @Column(name = "contents", nullable = false)
     private String content;
 

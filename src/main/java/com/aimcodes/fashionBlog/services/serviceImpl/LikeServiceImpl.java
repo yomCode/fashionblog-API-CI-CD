@@ -25,9 +25,9 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
 
     @Override
-    public ResponseEntity<ApiResponse> createLike(Long comment_id, HttpSession session){
+    public ResponseEntity<ApiResponse> createLike(String uuid, HttpSession session){
         User user = (User) session.getAttribute("currUser");
-        Comment comment = commentRepository.findById(comment_id).orElse(null);
+        Comment comment = commentRepository.findByUuid(uuid);
 
         if(user != null && comment != null){
             Like like = Like.builder()
@@ -37,7 +37,7 @@ public class LikeServiceImpl implements LikeService {
             return new ResponseEntity<>(new ResponseManager().successfulRequest(like), HttpStatus.CREATED);
         } else if (user == null)
             throw new HandleNullException("Invalid user", "No user in session");
-        throw new HandleNullException("Invalid comment", "Comment with id " + comment_id + " does not exist in database");
+        throw new HandleNullException("Invalid comment", "Comment with id " +  uuid + " does not exist in database");
     }
 
     @Override
@@ -47,5 +47,4 @@ public class LikeServiceImpl implements LikeService {
 
         return new ResponseManager().successfulRequest("deleted!");
     }
-
 }

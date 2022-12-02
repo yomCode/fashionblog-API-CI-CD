@@ -15,7 +15,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class UserRequestDto {
 
-//    @NotBlank(message = "username is required")
     @NotNull(message = "username cannot be empty")
     @Size(min = 4, max = 10, message = "Username must be between 4 and 8 characters")
     private String username;
@@ -24,9 +23,12 @@ public class UserRequestDto {
     @Email(message = "Invalid email address")
     private String email;
 
-//    @NotBlank(message = "password is required")
     @NotNull(message = "Enter password")
     @Size(min = 6, max = 20, message = "Password must be at least 6 characters long")
     private String password;
 
+    public UserRequestDto(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }

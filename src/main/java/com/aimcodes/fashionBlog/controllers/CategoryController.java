@@ -22,14 +22,14 @@ public class CategoryController {
     }
 
 
-    @PatchMapping("/edit-category/{category_id}")
-    public ResponseEntity<ApiResponse> updateCategory(@RequestBody CategoryRequestDto request, @PathVariable Long category_id, HttpSession session){
-        return categoryService.updateCategory(request, category_id, session);
+    @PatchMapping("/edit-category/{uuid}")
+    public ResponseEntity<ApiResponse> updateCategory(@RequestBody CategoryRequestDto request, @PathVariable String uuid, HttpSession session){
+        return categoryService.updateCategory(request, uuid, session);
     }
 
-    @DeleteMapping("/delete_category/{category_id}")
-    public ResponseEntity<ApiResponse> deleteCategory(@PathVariable Long category_id, HttpSession session){
-        return categoryService.deleteCategory(category_id, session);
+    @DeleteMapping("/delete_category/{uuid}")
+    public ResponseEntity<ApiResponse> deleteCategory(@PathVariable String uuid, HttpSession session){
+        return categoryService.deleteCategory(uuid, session);
     }
 
     @GetMapping("/categories")

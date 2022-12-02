@@ -15,6 +15,10 @@ import javax.persistence.*;
 @Table(name = "likes")
 @Builder
 public class Like extends BaseEntity{
+
+    @Column(name = "UUID", unique = true)
+    private String uuid;
+
     @ManyToOne
     @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;

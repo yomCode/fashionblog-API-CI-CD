@@ -5,12 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name="users")
@@ -21,6 +16,9 @@ import java.util.Set;
 @ToString
 @Builder
 public class User extends BaseEntity{
+
+    @Column(name = "UUID", unique = true)
+    private String uuid;
 
     @Column(name = "username", unique = true)
     private String username;
@@ -36,6 +34,17 @@ public class User extends BaseEntity{
     private String password;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Post> posts;
+
+    public User(String username, String email) {
+        this.username = username;
+        this.email = email;
+    }
+
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
 }

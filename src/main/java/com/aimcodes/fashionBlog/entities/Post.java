@@ -16,6 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 public class Post extends BaseEntity implements Serializable {
 
+    @Column(name = "UUID", unique = true)
+    private String uuid;
+
     @Column(name="title", nullable = false)
     private String title;
 

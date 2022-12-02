@@ -23,7 +23,6 @@ public class UserController {
     public ResponseEntity<ApiResponse> newUser(@Valid @RequestBody UserRequestDto request){
 
         return userService.createUser(request);
-
     }
 
     @PostMapping("/login")

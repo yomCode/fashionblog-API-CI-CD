@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,26 +17,26 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping("/new/{post_id}")
-    public ResponseEntity<ApiResponse> create_comment(@RequestBody CommentRequestDto request, @PathVariable Long post_id, HttpSession session){
-        return commentService.create_comment(request, post_id, session);
+    @PostMapping("/new/{uuid}")
+    public ResponseEntity<ApiResponse> create_comment(@RequestBody CommentRequestDto request, @PathVariable String uuid, HttpSession session){
+        return commentService.create_comment(request, uuid, session);
     }
 
 
-    @DeleteMapping("/delete/{comment_id}")
-    public ResponseEntity<ApiResponse> delete_comment(@PathVariable Long comment_id, HttpSession session){
-        return commentService.deleteComment(comment_id, session);
+    @DeleteMapping("/delete/{uuid}")
+    public ResponseEntity<ApiResponse> delete_comment(@PathVariable String uuid, HttpSession session){
+        return commentService.deleteComment(uuid, session);
     }
 
 
-    @GetMapping("/view/{comment_id}")
-    public ResponseEntity<ApiResponse> viewComment(@PathVariable Long comment_id){
-        return commentService.view_comment(comment_id);
+    @GetMapping("/view/{uuid}")
+    public ResponseEntity<ApiResponse> viewComment(@PathVariable String uuid){
+        return commentService.view_comment(uuid);
     }
 
-    @GetMapping("/view-all/{post_id}")
-    public ResponseEntity<ApiResponse> view_all_comment(@PathVariable Long post_id){
-        return commentService.view_all_comments(post_id);
+    @GetMapping("/view-all/{uuid}")
+    public ResponseEntity<ApiResponse> view_all_comment(@PathVariable String uuid){
+        return commentService.view_all_comments(uuid);
     }
 
 

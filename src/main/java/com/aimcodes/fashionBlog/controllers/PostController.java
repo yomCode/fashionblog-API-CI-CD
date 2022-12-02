@@ -25,17 +25,17 @@ public class PostController {
         return postService.createPost(request, session);
     }
 
-    @PutMapping("/edit/{post_id}")
-    public ResponseEntity<ApiResponse> edit_post(@RequestBody PostRequestDto request, @PathVariable Long post_id, HttpSession session){
+    @PutMapping("/edit/{uuid}")
+    public ResponseEntity<ApiResponse> edit_post(@RequestBody PostRequestDto request, @PathVariable String uuid, HttpSession session){
 
-        return postService.edit_post(request, post_id, session);
+        return postService.edit_post(request, uuid, session);
     }
 
 
-    @DeleteMapping("/delete/{post_id}")
-    public ResponseEntity<ApiResponse> delete_post(@PathVariable Long post_id, HttpSession session){
+    @DeleteMapping("/delete/{uuid}")
+    public ResponseEntity<ApiResponse> delete_post(@PathVariable String uuid, HttpSession session){
 
-        return postService.delete_Post(post_id, session);
+        return postService.delete_Post(uuid, session);
     }
 
     @GetMapping("/view-all")
@@ -43,10 +43,10 @@ public class PostController {
         return postService.view_all_post();
     }
 
-    @GetMapping("/view-all/{category}")
-    public ResponseEntity<ApiResponse> view_Post_by_Category(@PathVariable String category){
+    @GetMapping("/view-all/{uuid}")
+    public ResponseEntity<ApiResponse> view_Post_by_Category(@PathVariable String uuid){
 
-        return postService.view_post_by_category(category);
+        return postService.view_post_by_category(uuid);
     }
 
 }

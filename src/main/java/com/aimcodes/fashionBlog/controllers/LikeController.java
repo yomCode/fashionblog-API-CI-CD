@@ -17,10 +17,10 @@ public class LikeController {
     private final LikeService likeservice;
 
 
-    @PostMapping("/new/{comment_id}")
-    public ResponseEntity<ApiResponse> likeComment(@PathVariable Long comment_id, HttpSession session){
+    @PostMapping("/new/{uuid}")
+    public ResponseEntity<ApiResponse> likeComment(@PathVariable String uuid, HttpSession session){
 
-        return likeservice.createLike(comment_id, session);
+        return likeservice.createLike(uuid, session);
     }
 
 

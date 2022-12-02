@@ -13,5 +13,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     ResponseEntity<List<ApiResponse>> findByCategory(Category category);
+    Post findByUuid(String uuid);
 
 }

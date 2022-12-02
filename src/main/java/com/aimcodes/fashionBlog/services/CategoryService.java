@@ -10,9 +10,9 @@ public interface CategoryService {
 
     ResponseEntity<ApiResponse> createCategory(CategoryRequestDto request, HttpSession session);
 
-    ResponseEntity<ApiResponse> updateCategory(CategoryRequestDto request, Long category_id, HttpSession session);
+    ResponseEntity<ApiResponse> updateCategory(CategoryRequestDto request, String uuid, HttpSession session);
 
-    ResponseEntity<ApiResponse> deleteCategory(Long category_id, HttpSession session);
+    ResponseEntity<ApiResponse> deleteCategory(String uuid, HttpSession session);
 
     ResponseEntity<ApiResponse> view_all_Categories();
 

@@ -14,8 +14,8 @@ import com.aimcodes.fashionBlog.repositories.CategoryRepository;
 import com.aimcodes.fashionBlog.repositories.PostRepository;
 import com.aimcodes.fashionBlog.services.PostService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
+import com.aimcodes.fashionBlog.utils.UuidGenerator;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,15 +29,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
-    private final ModelMapper modelMapper;
+//    private final ModelMapper modelMapper;
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final ResponseManager responseManager;
+    private final UuidGenerator uuidGenerator;
 
     @Override
     public ResponseEntity<ApiResponse> createPost(PostRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("currUser");
         if (user != null && user.getRole().equals(Role.valueOf("ADMIN"))) {
+            String uuid = uuidGenerator.generateUuid();
             Category category = categoryRepository.findByName(request.getCategory().toLowerCase());
 
 //            Post post = modelMapper.map(request, Post.class);
@@ -45,11 +47,8 @@ public class PostServiceImpl implements PostService {
                             .content(request.getContent())
                                     .category(category)
                                             .user(user)
-                                                .build();
-//            post.setTitle(request.getTitle());
-//            post.setContent(request.getContent());
-//            post.setCategory(category);
-//            post.setUser(user);
+                                                    .uuid(uuid)
+                                                         .build();
             postRepository.save(post);
 
 //            PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
@@ -58,10 +57,6 @@ public class PostServiceImpl implements PostService {
                                     .content(post.getContent())
                                             .created_date(post.getCreatedAt())
                                                     .category(post.getCategory().getName()).build();
-//            response.setTitle(post.getTitle());
-//            response.setContent(post.getContent());
-//            response.setCreated_date(post.getCreatedAt());
-//            response.setCategory(post.getCategory().getName());
 
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.CREATED);
         }else if (user == null)
@@ -71,11 +66,11 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public ResponseEntity<ApiResponse> edit_post(PostRequestDto request, Long post_id, HttpSession session) {
+    public ResponseEntity<ApiResponse> edit_post(PostRequestDto request, String uuid, HttpSession session) {
 
         User user = (User) session.getAttribute("currUser");
         if (user != null && user.getRole().equals(Role.valueOf("ADMIN"))) {
-            Post post = postRepository.findById(post_id).orElseThrow(null);
+            Post post = postRepository.findByUuid(uuid);
 
             if(post != null)
                 post.setTitle(request.getTitle());
@@ -88,10 +83,6 @@ public class PostServiceImpl implements PostService {
                                     .content(post.getContent())
                                             .created_date(post.getCreatedAt())
                                                     .category(post.getCategory().getName()).build();
-//            response.setTitle(post.getTitle());
-//            response.setContent(post.getContent());
-//            response.setCreated_date(post.getCreatedAt());
-//            response.setCategory(post.getCategory().getName());
 
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
         }else if(user == null)
@@ -100,10 +91,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse> delete_Post(Long post_id, HttpSession session){
+    public ResponseEntity<ApiResponse> delete_Post(String uuid, HttpSession session){
         User user = (User) session.getAttribute("currUser");
         if(user != null && user.getRole().equals(Role.valueOf("ADMIN"))){
-            Post post = postRepository.findById(post_id).get();
+            Post post = postRepository.findByUuid(uuid);
             postRepository.delete(post);
 
             return new ResponseEntity<>(
@@ -127,18 +118,14 @@ public class PostServiceImpl implements PostService {
                         .content(post.getContent())
                             .created_date(post.getCreatedAt())
                                 .category(post.getCategory().getName()).build();
-//            PostResponseDto response = new PostResponseDto();
-//            response.setTitle(post.getTitle());
-//            response.setCategory(post.getCategory().getName());
-//            response.setContent(post.getContent());
             responses.add(response);
         });
         return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.ACCEPTED);
     }
 
     @Override
-    public ResponseEntity<ApiResponse> view_post_by_category(String categoryName){
-        Category category = categoryRepository.findByName(categoryName);
+    public ResponseEntity<ApiResponse> view_post_by_category(String uuid){
+        Category category = categoryRepository.findByUuid(uuid);
 
         if(category != null){
             List<Post> posts = category.getPosts();
@@ -150,16 +137,11 @@ public class PostServiceImpl implements PostService {
                             .content(post.getContent())
                                 .created_date(post.getCreatedAt())
                                     .category(post.getCategory().getName()).build();
-//                PostResponseDto response = new PostResponseDto();
-//                response.setTitle(post.getTitle());
-//                response.setContent(post.getContent());
-//                response.setCreated_date(post.getCreatedAt());
-//                response.setCategory(post.getCategory().getName());
                 responses.add(response);
             });
             return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.ACCEPTED);
         }
-        throw new NoDataFoundException("No such category", categoryName + " does not exist in the database");
+        throw new NoDataFoundException("No such category", uuid + " does not exist in the database");
     }
 
 }

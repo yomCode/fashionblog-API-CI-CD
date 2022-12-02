@@ -13,6 +13,7 @@ import com.aimcodes.fashionBlog.repositories.CommentRepository;
 import com.aimcodes.fashionBlog.repositories.PostRepository;
 import com.aimcodes.fashionBlog.services.CommentService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
+import com.aimcodes.fashionBlog.utils.UuidGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +31,22 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ResponseManager responseManager;
+    private final UuidGenerator uuidGenerator;
 
     @Override
-    public ResponseEntity<ApiResponse> create_comment(CommentRequestDto request, Long post_id, HttpSession session){
+    public ResponseEntity<ApiResponse> create_comment(CommentRequestDto request, String uuid, HttpSession session){
         User user = (User) session.getAttribute("currUser");
-        Post post = postRepository.findById(post_id).orElse(null);
+        Post post = postRepository.findByUuid(uuid);
 
         if(user != null){
+            String uuidGen = uuidGenerator.generateUuid();
             Comment comment = Comment.builder()
                     .content(request.getContent())
                             .user(user)
                                     .post(post)
                                         .comment_author(user.getUsername())
-                                            .build();
+                                            .uuid(uuidGen)
+                                                .build();
             commentRepository.save(comment);
 
             CommentResponseDto response = CommentResponseDto.builder()
@@ -79,14 +83,14 @@ public class CommentServiceImpl implements CommentService {
                     .author(comment.getComment_author())
                         .build();
         if(post == null)
-            throw new HandleNullException("Invalid post", "Post with id " + post_id + " does not exist in the database");
+            throw new HandleNullException("Invalid post", "Post with id " + uuid + " does not exist in the database");
         return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
     }
 
     @Override
-    public ResponseEntity<ApiResponse> deleteComment(Long comment_id, HttpSession session){
+    public ResponseEntity<ApiResponse> deleteComment(String uuid, HttpSession session){
         User user = (User) session.getAttribute("currUser");
-        Comment comment = commentRepository.findById(comment_id).orElse(null);
+        Comment comment = commentRepository.findByUuid(uuid);
 
         if(user != null && user.getRole().equals(Role.valueOf("ADMIN"))){
             commentRepository.delete(comment);
@@ -95,14 +99,14 @@ public class CommentServiceImpl implements CommentService {
         } else if (user == null)
             throw new HandleNullException("Invalid user", "No user in session");
         if(comment == null)
-            throw new HandleNullException("Comment unavailable", "Comment with id " + comment_id + " does not exist in the database");
+            throw new HandleNullException("Comment unavailable", "Comment with id " + uuid + " does not exist in the database");
         throw new NoAccessException("No access to delete comment", "wrong user or user is not an admin");
     }
 
 
     @Override
-    public ResponseEntity<ApiResponse> view_comment(Long comment_id){
-        Comment comment = commentRepository.findById(comment_id).orElse(null);
+    public ResponseEntity<ApiResponse> view_comment(String uuid){
+        Comment comment = commentRepository.findByUuid(uuid);
 
         if(comment != null) {
             CommentResponseDto response = CommentResponseDto.builder()
@@ -112,13 +116,13 @@ public class CommentServiceImpl implements CommentService {
                                 .build();
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.FOUND);
         }
-        throw new HandleNullException("Comment unavailable", "Comment with id " + comment_id + " does not exist in the database");
+        throw new HandleNullException("Comment unavailable", "Comment with id " + uuid + " does not exist in the database");
     }
 
 
     @Override
-    public ResponseEntity<ApiResponse> view_all_comments(Long post_id){
-        Post post = postRepository.findById(post_id).orElse(null);
+    public ResponseEntity<ApiResponse> view_all_comments(String uuid){
+        Post post = postRepository.findByUuid(uuid);
 
         if (post != null) {
             List<Comment> comments = post.getComments();
@@ -126,15 +130,15 @@ public class CommentServiceImpl implements CommentService {
             comments.forEach(comment -> {
                 CommentResponseDto response = CommentResponseDto.builder()
                         .author(comment.getComment_author())
-                        .content(comment.getContent())
-                        .likes(comment.getLikes().size())
-                        .build();
+                                .content(comment.getContent())
+                                        .likes(comment.getLikes().size())
+                                                .build();
                 responses.add(response);
 
             });
             return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.FOUND);
         }
-        throw new HandleNullException("Invalid post", "Post with id " + post_id + " does not exist in the database");
+        throw new HandleNullException("Invalid post", "Post with id " + uuid + " does not exist in the database");
     }
 
 }

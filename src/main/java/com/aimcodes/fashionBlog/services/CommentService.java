@@ -11,11 +11,11 @@ import java.util.Set;
 
 public interface CommentService {
 
-    ResponseEntity<ApiResponse> create_comment(CommentRequestDto request, Long post_id, HttpSession session);
+    ResponseEntity<ApiResponse> create_comment(CommentRequestDto request, String uuid, HttpSession session);
 
-    ResponseEntity<ApiResponse> deleteComment(Long comment_id, HttpSession session);
+    ResponseEntity<ApiResponse> deleteComment(String uuid, HttpSession session);
 
-    ResponseEntity<ApiResponse> view_comment(Long comment_id);
+    ResponseEntity<ApiResponse> view_comment(String uuid);
 
-    ResponseEntity<ApiResponse> view_all_comments(Long post_id);
+    ResponseEntity<ApiResponse> view_all_comments(String uuid);
 }

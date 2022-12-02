@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 
 public interface LikeService {
 
-    ResponseEntity<ApiResponse> createLike(Long comment_id, HttpSession session);
+    ResponseEntity<ApiResponse> createLike(String uuid, HttpSession session);
 
     ApiResponse unlike(Long like_id);
 }

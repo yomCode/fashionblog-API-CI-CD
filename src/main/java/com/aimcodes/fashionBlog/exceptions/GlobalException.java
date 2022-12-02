@@ -69,4 +69,15 @@ public class GlobalException {
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(HandleDuplicateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ResponseEntity<?> HandleAlreadyExistException(HandleDuplicateException ex){
+        GlobalErrorMessage errorMessage = GlobalErrorMessage.builder()
+                .message(ex.getMessage())
+                .debugMsg(ex.getDebugMsg())
+                .status(HttpStatus.BAD_REQUEST).build();
+
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
 }
