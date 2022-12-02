@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
 
@@ -15,12 +19,13 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
+@Builder
 public class User extends BaseEntity{
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username", unique = true)
     private String username;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)

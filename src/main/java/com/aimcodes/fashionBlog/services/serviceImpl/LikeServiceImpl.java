@@ -10,6 +10,8 @@ import com.aimcodes.fashionBlog.repositories.LikeRepository;
 import com.aimcodes.fashionBlog.services.LikeService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -23,7 +25,7 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
 
     @Override
-    public ApiResponse createLike(Long comment_id, HttpSession session){
+    public ResponseEntity<ApiResponse> createLike(Long comment_id, HttpSession session){
         User user = (User) session.getAttribute("currUser");
         Comment comment = commentRepository.findById(comment_id).orElse(null);
         Like like = new Like();
@@ -32,7 +34,7 @@ public class LikeServiceImpl implements LikeService {
             like.setUser(user);
         }
         likeRepository.save(like);
-        return new ResponseManager().successfulRequest(like);
+        return new ResponseEntity<>(new ResponseManager().successfulRequest(like), HttpStatus.CREATED);
     }
 
 

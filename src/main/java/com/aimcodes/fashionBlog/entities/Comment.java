@@ -2,6 +2,7 @@ package com.aimcodes.fashionBlog.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class Comment extends BaseEntity{
     @Column(name = "contents", nullable = false)
     private String content;
@@ -29,7 +31,7 @@ public class Comment extends BaseEntity{
     private Post post;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "comment", orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Like> likes;
 
 }

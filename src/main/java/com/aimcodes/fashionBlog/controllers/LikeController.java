@@ -4,6 +4,7 @@ package com.aimcodes.fashionBlog.controllers;
 import com.aimcodes.fashionBlog.pojos.ApiResponse;
 import com.aimcodes.fashionBlog.services.LikeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -17,7 +18,7 @@ public class LikeController {
 
 
     @PostMapping("/new/{comment_id}")
-    public ApiResponse likeComment(@PathVariable Long comment_id, HttpSession session){
+    public ResponseEntity<ApiResponse> likeComment(@PathVariable Long comment_id, HttpSession session){
 
         return likeservice.createLike(comment_id, session);
     }

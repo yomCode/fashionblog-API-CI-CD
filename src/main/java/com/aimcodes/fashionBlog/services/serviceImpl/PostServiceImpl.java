@@ -37,26 +37,35 @@ public class PostServiceImpl implements PostService {
     @Override
     public ResponseEntity<ApiResponse> createPost(PostRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("currUser");
-        if (user.getRole().equals(Role.valueOf("ADMIN"))) {
+        if (user != null && user.getRole().equals(Role.valueOf("ADMIN"))) {
             Category category = categoryRepository.findByName(request.getCategory().toLowerCase());
 
 //            Post post = modelMapper.map(request, Post.class);
-            Post post = new Post();
-            post.setTitle(request.getTitle());
-            post.setContent(request.getContent());
-            post.setCategory(category);
-            post.setUser(user);
+            Post post = Post.builder().title(request.getTitle())
+                            .content(request.getContent())
+                                    .category(category)
+                                            .user(user)
+                                                .build();
+//            post.setTitle(request.getTitle());
+//            post.setContent(request.getContent());
+//            post.setCategory(category);
+//            post.setUser(user);
             postRepository.save(post);
 
 //            PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
-            PostResponseDto response = new PostResponseDto();
-            response.setTitle(post.getTitle());
-            response.setContent(post.getContent());
-            response.setCreated_date(post.getCreatedAt());
-            response.setCategory(post.getCategory().getName());
+            PostResponseDto response = PostResponseDto.builder()
+                            .title(post.getTitle())
+                                    .content(post.getContent())
+                                            .created_date(post.getCreatedAt())
+                                                    .category(post.getCategory().getName()).build();
+//            response.setTitle(post.getTitle());
+//            response.setContent(post.getContent());
+//            response.setCreated_date(post.getCreatedAt());
+//            response.setCategory(post.getCategory().getName());
 
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.CREATED);
-        }
+        }else if (user == null)
+            throw new HandleNullException("Invalid user request", "No user in session");
         throw new NoAccessException("Unauthorized user", "User doesnt have the right to create a post!");
     }
 
@@ -69,15 +78,20 @@ public class PostServiceImpl implements PostService {
             Post post = postRepository.findById(post_id).orElseThrow(null);
 
             if(post != null)
-            post.setTitle(request.getTitle());
+                post.setTitle(request.getTitle());
+            assert post != null;
             post.setContent(request.getContent());
             postRepository.save(post);
 
-            PostResponseDto response = new PostResponseDto();
-            response.setTitle(post.getTitle());
-            response.setContent(post.getContent());
-            response.setCreated_date(post.getCreatedAt());
-            response.setCategory(post.getCategory().getName());
+            PostResponseDto response = PostResponseDto.builder()
+                            .title(post.getTitle())
+                                    .content(post.getContent())
+                                            .created_date(post.getCreatedAt())
+                                                    .category(post.getCategory().getName()).build();
+//            response.setTitle(post.getTitle());
+//            response.setContent(post.getContent());
+//            response.setCreated_date(post.getCreatedAt());
+//            response.setCategory(post.getCategory().getName());
 
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
         }else if(user == null)
@@ -96,7 +110,8 @@ public class PostServiceImpl implements PostService {
                     responseManager.successfulRequest("Post deleted successfully!"),
                     HttpStatus.ACCEPTED
             );
-        }
+        }else if(user == null)
+            throw new HandleNullException("Invalid user request", "No user in session");
         throw new NoAccessException("Unauthorized user", "User doesnt have the right to delete this post!");
     }
 
@@ -107,10 +122,15 @@ public class PostServiceImpl implements PostService {
 
         posts.forEach(post -> {
 //            PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
-            PostResponseDto response = new PostResponseDto();
-            response.setTitle(post.getTitle());
-            response.setCategory(post.getCategory().getName());
-            response.setContent(post.getContent());
+            PostResponseDto response = PostResponseDto.builder()
+                    .title(post.getTitle())
+                        .content(post.getContent())
+                            .created_date(post.getCreatedAt())
+                                .category(post.getCategory().getName()).build();
+//            PostResponseDto response = new PostResponseDto();
+//            response.setTitle(post.getTitle());
+//            response.setCategory(post.getCategory().getName());
+//            response.setContent(post.getContent());
             responses.add(response);
         });
         return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.ACCEPTED);
@@ -125,11 +145,16 @@ public class PostServiceImpl implements PostService {
             List<PostResponseDto> responses = new ArrayList<>();
             posts.forEach(post -> {
 //                PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
-                PostResponseDto response = new PostResponseDto();
-                response.setTitle(post.getTitle());
-                response.setContent(post.getContent());
-                response.setCreated_date(post.getCreatedAt());
-                response.setCategory(post.getCategory().getName());
+                PostResponseDto response = PostResponseDto.builder()
+                        .title(post.getTitle())
+                            .content(post.getContent())
+                                .created_date(post.getCreatedAt())
+                                    .category(post.getCategory().getName()).build();
+//                PostResponseDto response = new PostResponseDto();
+//                response.setTitle(post.getTitle());
+//                response.setContent(post.getContent());
+//                response.setCreated_date(post.getCreatedAt());
+//                response.setCategory(post.getCategory().getName());
                 responses.add(response);
             });
             return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.ACCEPTED);

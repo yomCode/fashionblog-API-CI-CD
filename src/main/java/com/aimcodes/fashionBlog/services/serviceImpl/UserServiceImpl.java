@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.Errors;
 
 import javax.servlet.http.HttpSession;
 
@@ -27,17 +26,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<ApiResponse> createUser(UserRequestDto request) {
 
-        User user = new User();
-        user.setUsername(request.getUsername().toLowerCase());
-        user.setEmail(request.getEmail().toLowerCase());
-        user.setPassword(request.getPassword());
-        user.setRole(Role.USER);
+        User user = User.builder()
+                .username(request.getUsername().toLowerCase())
+                        .email(request.getEmail())
+                                .password(request.getPassword())
+                                        .role(Role.USER).build();
+//        user.setUsername(request.getUsername().toLowerCase());
+//        user.setEmail(request.getEmail().toLowerCase());
+//        user.setPassword(request.getPassword());
+//        user.setRole(Role.USER);
         userRepository.save(user);
 
-        UserResponseDto response = new UserResponseDto();
-        response.setUser_id(user.getId());
-        response.setEmail(user.getEmail());
-        response.setUsername(user.getUsername());
+        UserResponseDto response = UserResponseDto.builder()
+                .user_id(user.getId())
+                    .username(user.getUsername())
+                        .email(user.getEmail()).build();
+//        response.setUser_id(user.getId());
+//        response.setEmail(user.getEmail());
+//        response.setUsername(user.getUsername());
 
         return new ResponseEntity<>(new ResponseManager().successfulRequest(response), HttpStatus.CREATED);
 
@@ -51,10 +57,13 @@ public class UserServiceImpl implements UserService {
 
         if(user != null){
             session.setAttribute("currUser", user);
-            UserResponseDto response = new UserResponseDto();
-            response.setUser_id(user.getId());
-            response.setEmail(user.getEmail());
-            response.setUsername(user.getUsername());
+            UserResponseDto response = UserResponseDto.builder()
+                            .user_id(user.getId())
+                                    .email(user.getEmail())
+                                            .username(user.getUsername()).build();
+//            response.setUser_id(user.getId());
+//            response.setEmail(user.getEmail());
+//            response.setUsername(user.getUsername());
 
             return new ResponseEntity<>(new ResponseManager().successfulRequest(response), HttpStatus.OK) ;
         }

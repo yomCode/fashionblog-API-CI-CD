@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Post extends BaseEntity implements Serializable {
@@ -24,7 +25,7 @@ public class Post extends BaseEntity implements Serializable {
 //    private byte[] image
 
     @JsonIgnore
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Comment> comments;
 
     @ManyToOne

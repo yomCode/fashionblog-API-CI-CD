@@ -4,6 +4,8 @@ import com.aimcodes.fashionBlog.entities.Comment;
 import com.aimcodes.fashionBlog.entities.Post;
 import com.aimcodes.fashionBlog.entities.User;
 import com.aimcodes.fashionBlog.enums.Role;
+import com.aimcodes.fashionBlog.exceptions.HandleNullException;
+import com.aimcodes.fashionBlog.exceptions.NoAccessException;
 import com.aimcodes.fashionBlog.pojos.ApiResponse;
 import com.aimcodes.fashionBlog.pojos.CommentRequestDto;
 import com.aimcodes.fashionBlog.pojos.CommentResponseDto;
@@ -35,59 +37,66 @@ public class CommentServiceImpl implements CommentService {
         Post post = postRepository.findById(post_id).orElse(null);
 
         if(user != null){
-            Comment comment = new Comment();
-            comment.setUser(user);
-            comment.setContent(request.getContent());
-            comment.setComment_author(user.getUsername());
-            comment.setPost(post);
+            Comment comment = Comment.builder()
+                    .content(request.getContent())
+                            .user(user)
+                                    .post(post)
+                                        .comment_author(user.getUsername())
+                                            .build();
             commentRepository.save(comment);
 
-            CommentResponseDto response = new CommentResponseDto();
-            response.setContent(comment.getContent());
-            response.setAuthor(comment.getComment_author());
+            CommentResponseDto response = CommentResponseDto.builder()
+                    .content(comment.getContent())
+                        .author(comment.getComment_author())
+                            .build();
 
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
 
         }else if(user == null && request.getComment_author() != null){
-            Comment comment = new Comment();
-            comment.setContent(request.getContent());
-            comment.setComment_author(request.getComment_author());
-            comment.setPost(post);
+            Comment comment = Comment.builder()
+                    .content(request.getContent())
+                            .comment_author(request.getComment_author())
+                                .post(post).build();
             commentRepository.save(comment);
 
-            CommentResponseDto response = new CommentResponseDto();
-            response.setContent(comment.getContent());
-            response.setAuthor(comment.getComment_author());
+            CommentResponseDto response = CommentResponseDto.builder()
+                    .content(comment.getContent())
+                        .author(comment.getComment_author())
+                            .build();
 
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
-
         }
 
-        Comment comment = new Comment();
-        comment.setContent(request.getContent());
-        comment.setComment_author("Anonymous");
-        comment.setPost(post);
+        Comment comment = Comment.builder()
+                .content(request.getContent())
+                        .comment_author("Anonymous")
+                                .post(post)
+                                    .build();
         commentRepository.save(comment);
 
-        CommentResponseDto response = new CommentResponseDto();
-        response.setContent(comment.getContent());
-        response.setAuthor(comment.getComment_author());
-
+        CommentResponseDto response = CommentResponseDto.builder()
+                .content(comment.getContent())
+                    .author(comment.getComment_author())
+                        .build();
+        if(post == null)
+            throw new HandleNullException("Invalid post", "Post with id " + post_id + " does not exist in the database");
         return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
     }
-
 
     @Override
     public ResponseEntity<ApiResponse> deleteComment(Long comment_id, HttpSession session){
         User user = (User) session.getAttribute("currUser");
         Comment comment = commentRepository.findById(comment_id).orElse(null);
 
-        if(user.getId().equals(comment.getUser().getId()) || user.getRole().equals(Role.valueOf("ADMIN"))){
+        if(user != null && user.getRole().equals(Role.valueOf("ADMIN"))){
             commentRepository.delete(comment);
 
             return new ResponseEntity<>(responseManager.successfulRequest("comment deleted successfully!"), HttpStatus.ACCEPTED);
-        }
-        return null;
+        } else if (user == null)
+            throw new HandleNullException("Invalid user", "No user in session");
+        if(comment == null)
+            throw new HandleNullException("Comment unavailable", "Comment with id " + comment_id + " does not exist in the database");
+        throw new NoAccessException("No access to delete comment", "wrong user or user is not an admin");
     }
 
 
@@ -95,12 +104,15 @@ public class CommentServiceImpl implements CommentService {
     public ResponseEntity<ApiResponse> view_comment(Long comment_id){
         Comment comment = commentRepository.findById(comment_id).orElse(null);
 
-        CommentResponseDto response = new CommentResponseDto();
-        assert comment != null;
-        response.setContent(comment.getContent());
-        response.setAuthor(comment.getComment_author());
-        response.setLikes(comment.getLikes().size());
-        return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.FOUND);
+        if(comment != null) {
+            CommentResponseDto response = CommentResponseDto.builder()
+                    .author(comment.getComment_author())
+                        .content(comment.getContent())
+                            .likes(comment.getLikes().size())
+                                .build();
+            return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.FOUND);
+        }
+        throw new HandleNullException("Comment unavailable", "Comment with id " + comment_id + " does not exist in the database");
     }
 
 
@@ -108,17 +120,21 @@ public class CommentServiceImpl implements CommentService {
     public ResponseEntity<ApiResponse> view_all_comments(Long post_id){
         Post post = postRepository.findById(post_id).orElse(null);
 
-        List<Comment> comments = post.getComments();
-        List<CommentResponseDto> responses = new ArrayList<>();
-        comments.forEach(comment ->{
-            CommentResponseDto response = new CommentResponseDto();
-            response.setContent(comment.getContent());
-            response.setAuthor(comment.getComment_author());
-            response.setLikes(comment.getLikes().size());
-            responses.add(response);
+        if (post != null) {
+            List<Comment> comments = post.getComments();
+            List<CommentResponseDto> responses = new ArrayList<>();
+            comments.forEach(comment -> {
+                CommentResponseDto response = CommentResponseDto.builder()
+                        .author(comment.getComment_author())
+                        .content(comment.getContent())
+                        .likes(comment.getLikes().size())
+                        .build();
+                responses.add(response);
 
-        });
-        return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.FOUND);
+            });
+            return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.FOUND);
+        }
+        throw new HandleNullException("Invalid post", "Post with id " + post_id + " does not exist in the database");
     }
 
 }

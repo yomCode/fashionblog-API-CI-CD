@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class UserController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> newUser(@RequestBody UserRequestDto request){
+    public ResponseEntity<ApiResponse> newUser(@Valid @RequestBody UserRequestDto request){
 
         return userService.createUser(request);
 

@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Objects;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -51,6 +54,19 @@ public class GlobalException {
         errorMessage.setStatus(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+    }
+
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ResponseEntity<?> customValidationExceptionHandler(MethodArgumentNotValidException ex){
+        GlobalErrorMessage errorMessage = new GlobalErrorMessage(
+                "Validation Error",
+                Objects.requireNonNull(ex.getBindingResult().getFieldError()).getDefaultMessage(),
+                HttpStatus.BAD_REQUEST
+        );
+
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
 }
