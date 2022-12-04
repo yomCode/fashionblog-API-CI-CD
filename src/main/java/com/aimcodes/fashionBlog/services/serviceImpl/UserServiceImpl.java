@@ -60,9 +60,9 @@ public class UserServiceImpl implements UserService {
         if(user != null){
             session.setAttribute("currUser", user);
             UserResponseDto response = UserResponseDto.builder()
-                                    .email(user.getEmail())
-                                            .username(user.getUsername())
-                                                    .build();
+                    .email(user.getEmail())
+                    .username(user.getUsername())
+                    .build();
             return new ResponseEntity<>(new ResponseManager().successfulRequest(response), HttpStatus.OK);
         }
         throw new HandleNullException("wrong email or password", "No user found for this details");

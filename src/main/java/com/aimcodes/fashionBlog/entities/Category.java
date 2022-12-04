@@ -24,4 +24,9 @@ public class Category extends BaseEntity{
     @JsonIgnore
     @OneToMany(mappedBy = "category", orphanRemoval = true ,fetch = FetchType.EAGER)
     private List<Post> posts;
+
+    public Category(String uuid, String name) {
+        this.uuid = uuid;
+        this.name = name;
+    }
 }

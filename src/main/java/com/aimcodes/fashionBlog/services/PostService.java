@@ -18,4 +18,6 @@ public interface PostService {
     ResponseEntity<ApiResponse> view_all_post();
 
     ResponseEntity<ApiResponse> view_post_by_category(String categoryName);
+
+    ResponseEntity<ApiResponse> getPostByUuid(String uuid);
 }

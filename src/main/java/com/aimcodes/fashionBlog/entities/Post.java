@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post extends BaseEntity implements Serializable {
+public class Post extends BaseEntity{
 
     @Column(name = "UUID", unique = true)
     private String uuid;

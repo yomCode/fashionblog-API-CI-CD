@@ -56,8 +56,8 @@ public class CategoryServiceImpl implements CategoryService {
             categoryRepository.save(category);
 
             CategoryResponseDto response = CategoryResponseDto.builder()
-                            .name(category.getName())
-                                    .build();
+                    .name(category.getName())
+                    .build();
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
         } else if (category == null)
             throw new HandleNullException("Invalid category", "Category with id " + uuid + " does not exist in database");
@@ -83,8 +83,8 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryResponseDto> responses = new ArrayList<>();
         allCategories.forEach(category -> {
             CategoryResponseDto response = CategoryResponseDto.builder()
-                            .name(category.getName())
-                                    .build();
+                    .name(category.getName())
+                    .build();
             responses.add(response);
         });
         return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.FOUND);

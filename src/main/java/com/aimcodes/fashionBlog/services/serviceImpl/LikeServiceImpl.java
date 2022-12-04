@@ -32,7 +32,7 @@ public class LikeServiceImpl implements LikeService {
         if(user != null && comment != null){
             Like like = Like.builder()
                     .comment(comment)
-                        .build();
+                    .build();
             likeRepository.save(like);
             return new ResponseEntity<>(new ResponseManager().successfulRequest(like), HttpStatus.CREATED);
         } else if (user == null)

@@ -13,11 +13,10 @@ import javax.servlet.http.HttpSession;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/user/post")
+@RequestMapping("/api/v1/post")
 public class PostController {
 
     private final PostService postService;
-
 
     @PostMapping("/new")
     public ResponseEntity<ApiResponse> new_post(@RequestBody PostRequestDto request, HttpSession session){
@@ -30,7 +29,6 @@ public class PostController {
 
         return postService.edit_post(request, uuid, session);
     }
-
 
     @DeleteMapping("/delete/{uuid}")
     public ResponseEntity<ApiResponse> delete_post(@PathVariable String uuid, HttpSession session){
@@ -47,6 +45,11 @@ public class PostController {
     public ResponseEntity<ApiResponse> view_Post_by_Category(@PathVariable String uuid){
 
         return postService.view_post_by_category(uuid);
+    }
+
+    @GetMapping("/view/{uuid}")
+    public ResponseEntity<ApiResponse> getPostByUuid(@PathVariable String uuid){
+        return postService.getPostByUuid(uuid);
     }
 
 }

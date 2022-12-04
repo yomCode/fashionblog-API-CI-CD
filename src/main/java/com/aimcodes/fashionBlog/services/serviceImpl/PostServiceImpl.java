@@ -29,7 +29,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
-//    private final ModelMapper modelMapper;
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final ResponseManager responseManager;
@@ -42,23 +41,21 @@ public class PostServiceImpl implements PostService {
             String uuid = uuidGenerator.generateUuid();
             Category category = categoryRepository.findByName(request.getCategory().toLowerCase());
 
-//            Post post = modelMapper.map(request, Post.class);
             Post post = Post.builder().title(request.getTitle())
-                            .content(request.getContent())
-                                    .category(category)
-                                            .user(user)
-                                                    .uuid(uuid)
-                                                         .build();
+                    .content(request.getContent())
+                    .category(category)
+                    .user(user)
+                    .uuid(uuid)
+                    .build();
             postRepository.save(post);
 
-//            PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
             PostResponseDto response = PostResponseDto.builder()
-                            .title(post.getTitle())
-                                    .content(post.getContent())
-                                            .created_date(post.getCreatedAt())
-                                                    .category(post.getCategory().getName()).build();
-
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .created_date(post.getCreatedAt())
+                    .category(post.getCategory().getName()).build();
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.CREATED);
+
         }else if (user == null)
             throw new HandleNullException("Invalid user request", "No user in session");
         throw new NoAccessException("Unauthorized user", "User doesnt have the right to create a post!");
@@ -79,10 +76,10 @@ public class PostServiceImpl implements PostService {
             postRepository.save(post);
 
             PostResponseDto response = PostResponseDto.builder()
-                            .title(post.getTitle())
-                                    .content(post.getContent())
-                                            .created_date(post.getCreatedAt())
-                                                    .category(post.getCategory().getName()).build();
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .created_date(post.getCreatedAt())
+                    .category(post.getCategory().getName()).build();
 
             return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.ACCEPTED);
         }else if(user == null)
@@ -112,12 +109,11 @@ public class PostServiceImpl implements PostService {
         List<PostResponseDto> responses = new ArrayList<>();
 
         posts.forEach(post -> {
-//            PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
             PostResponseDto response = PostResponseDto.builder()
                     .title(post.getTitle())
-                        .content(post.getContent())
-                            .created_date(post.getCreatedAt())
-                                .category(post.getCategory().getName()).build();
+                    .content(post.getContent())
+                    .created_date(post.getCreatedAt())
+                    .category(post.getCategory().getName()).build();
             responses.add(response);
         });
         return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.ACCEPTED);
@@ -131,17 +127,29 @@ public class PostServiceImpl implements PostService {
             List<Post> posts = category.getPosts();
             List<PostResponseDto> responses = new ArrayList<>();
             posts.forEach(post -> {
-//                PostResponseDto response = modelMapper.map(post, PostResponseDto.class);
                 PostResponseDto response = PostResponseDto.builder()
                         .title(post.getTitle())
-                            .content(post.getContent())
-                                .created_date(post.getCreatedAt())
-                                    .category(post.getCategory().getName()).build();
+                        .content(post.getContent())
+                        .created_date(post.getCreatedAt())
+                        .category(post.getCategory().getName()).build();
                 responses.add(response);
             });
             return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.ACCEPTED);
         }
         throw new NoDataFoundException("No such category", uuid + " does not exist in the database");
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse> getPostByUuid(String uuid){
+        Post post = postRepository.findByUuid(uuid);
+
+        PostResponseDto response = PostResponseDto.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .category(String.valueOf(post.getCategory()))
+                .created_date(post.getCreatedAt())
+                .build();
+        return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.FOUND);
     }
 
 }
