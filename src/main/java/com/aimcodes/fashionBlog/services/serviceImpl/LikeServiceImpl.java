@@ -11,6 +11,7 @@ import com.aimcodes.fashionBlog.repositories.LikeRepository;
 import com.aimcodes.fashionBlog.services.LikeService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,13 @@ import javax.servlet.http.HttpSession;
 @RequiredArgsConstructor
 public class LikeServiceImpl implements LikeService {
 
+    @Autowired
+    private HttpSession session;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
 
     @Override
-    public ResponseEntity<ApiResponse> createLike(String uuid, HttpSession session){
+    public ResponseEntity<ApiResponse> createLike(String uuid){
         User user = (User) session.getAttribute("currUser");
         Comment comment = commentRepository.findByUuid(uuid);
 

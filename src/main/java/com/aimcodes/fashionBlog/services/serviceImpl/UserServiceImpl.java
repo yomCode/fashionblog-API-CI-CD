@@ -12,6 +12,7 @@ import com.aimcodes.fashionBlog.services.UserService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
 import com.aimcodes.fashionBlog.utils.UuidGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,8 @@ import javax.servlet.http.HttpSession;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
-
+    @Autowired
+    private HttpSession session;
     private final UserRepository userRepository;
     private final UuidGenerator uuidGenerator;
 
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse> userLogin(UserRequestDto request, HttpSession session) {
+    public ResponseEntity<ApiResponse> userLogin(UserRequestDto request) {
         User user = userRepository.findByUsernameAndPassword(
                 request.getUsername().toLowerCase(), request.getPassword());
 
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse> logout(HttpSession session){
+    public ResponseEntity<ApiResponse> logout(){
         session.invalidate();
         return new ResponseEntity<>(new ResponseManager().successfulRequest("User logged out successfully"), HttpStatus.OK);
     }

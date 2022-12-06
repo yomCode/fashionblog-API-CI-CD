@@ -16,6 +16,7 @@ import com.aimcodes.fashionBlog.services.PostService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
 import com.aimcodes.fashionBlog.utils.UuidGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,17 +30,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
+    @Autowired
+    private HttpSession session;
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final ResponseManager responseManager;
     private final UuidGenerator uuidGenerator;
 
+
     @Override
-    public ResponseEntity<ApiResponse> createPost(PostRequestDto request, HttpSession session) {
+    public ResponseEntity<ApiResponse> createPost(PostRequestDto request) {
         User user = (User) session.getAttribute("currUser");
         if (user != null && user.getRole().equals(Role.valueOf("ADMIN"))) {
             String uuid = uuidGenerator.generateUuid();
-            Category category = categoryRepository.findByName(request.getCategory().toLowerCase());
+            Category category = categoryRepository.findByName(request.getCategory().toLowerCase()).orElseThrow(() ->
+                   new NoDataFoundException("Category does not exist", "Enter a valid category name"));
 
             Post post = Post.builder().title(request.getTitle())
                     .content(request.getContent())
@@ -63,15 +68,14 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public ResponseEntity<ApiResponse> edit_post(PostRequestDto request, String uuid, HttpSession session) {
+    public ResponseEntity<ApiResponse> edit_post(PostRequestDto request, String uuid) {
 
         User user = (User) session.getAttribute("currUser");
         if (user != null && user.getRole().equals(Role.valueOf("ADMIN"))) {
-            Post post = postRepository.findByUuid(uuid);
+            Post post = postRepository.findByUuid(uuid).orElseThrow(()->
+                    new NoDataFoundException("No such post", "Post with uuid " + uuid + " does not exist"));
 
-            if(post != null)
-                post.setTitle(request.getTitle());
-            assert post != null;
+            post.setTitle(request.getTitle());
             post.setContent(request.getContent());
             postRepository.save(post);
 
@@ -88,10 +92,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse> delete_Post(String uuid, HttpSession session){
+    public ResponseEntity<ApiResponse> delete_Post(String uuid){
         User user = (User) session.getAttribute("currUser");
         if(user != null && user.getRole().equals(Role.valueOf("ADMIN"))){
-            Post post = postRepository.findByUuid(uuid);
+            Post post = postRepository.findByUuid(uuid).orElseThrow(()->
+                    new NoDataFoundException("No such post", "Post with uuid " + uuid + " does not exist"));
             postRepository.delete(post);
 
             return new ResponseEntity<>(
@@ -121,9 +126,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ResponseEntity<ApiResponse> view_post_by_category(String uuid){
-        Category category = categoryRepository.findByUuid(uuid);
+        Category category = categoryRepository.findByUuid(uuid).orElseThrow(() ->
+                new NoDataFoundException("No such category", uuid + " does not exist in the database"));
 
-        if(category != null){
             List<Post> posts = category.getPosts();
             List<PostResponseDto> responses = new ArrayList<>();
             posts.forEach(post -> {
@@ -135,13 +140,12 @@ public class PostServiceImpl implements PostService {
                 responses.add(response);
             });
             return new ResponseEntity<>(responseManager.successfulRequest(responses), HttpStatus.ACCEPTED);
-        }
-        throw new NoDataFoundException("No such category", uuid + " does not exist in the database");
     }
 
     @Override
     public ResponseEntity<ApiResponse> getPostByUuid(String uuid){
-        Post post = postRepository.findByUuid(uuid);
+        Post post = postRepository.findByUuid(uuid).orElseThrow(()->
+                new NoDataFoundException("No such post", "Post with uuid " + uuid + " does not exist"));
 
         PostResponseDto response = PostResponseDto.builder()
                 .title(post.getTitle())
@@ -150,6 +154,14 @@ public class PostServiceImpl implements PostService {
                 .created_date(post.getCreatedAt())
                 .build();
         return new ResponseEntity<>(responseManager.successfulRequest(response), HttpStatus.FOUND);
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse> searchPost(String question){
+
+        List<Post> posts = postRepository.findBySearch(question).orElseThrow(()-> new NoDataFoundException("No Post found", question + " is not found in any post"));
+
+        return new ResponseEntity<>(responseManager.successfulRequest(posts), HttpStatus.FOUND);
     }
 
 }

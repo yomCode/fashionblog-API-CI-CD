@@ -4,11 +4,9 @@ package com.aimcodes.fashionBlog.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.type.UUIDCharType;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 @MappedSuperclass
 @Data

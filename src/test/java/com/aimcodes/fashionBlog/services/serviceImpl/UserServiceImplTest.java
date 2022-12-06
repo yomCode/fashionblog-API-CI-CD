@@ -50,7 +50,7 @@ class UserServiceImplTest {
         UserResponseDto response = new UserResponseDto("akeem", "ak@gmail.com");
 
         when(userRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword())).thenReturn(user);
-        assertEquals(new ResponseEntity<>(new ResponseManager().successfulRequest(response), HttpStatus.OK), userService.userLogin(request, session));
+        assertEquals(new ResponseEntity<>(new ResponseManager().successfulRequest(response), HttpStatus.OK), userService.userLogin(request));
 
     }
 

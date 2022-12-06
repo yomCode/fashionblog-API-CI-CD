@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -24,8 +23,6 @@ public class Post extends BaseEntity{
 
     @Column(name = "contents", nullable = false)
     private String content;
-
-//    private byte[] image
 
     @JsonIgnore
     @OneToMany(mappedBy = "post", orphanRemoval = true, fetch = FetchType.EAGER)

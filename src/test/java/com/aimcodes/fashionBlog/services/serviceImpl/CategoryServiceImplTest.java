@@ -3,6 +3,7 @@ package com.aimcodes.fashionBlog.services.serviceImpl;
 import com.aimcodes.fashionBlog.entities.Category;
 import com.aimcodes.fashionBlog.entities.User;
 import com.aimcodes.fashionBlog.enums.Role;
+import com.aimcodes.fashionBlog.exceptions.NoDataFoundException;
 import com.aimcodes.fashionBlog.pojos.ApiResponse;
 import com.aimcodes.fashionBlog.pojos.CategoryRequestDto;
 import com.aimcodes.fashionBlog.pojos.UserRequestDto;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpSession;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpStatus.ACCEPTED;
@@ -41,24 +43,21 @@ class CategoryServiceImplTest {
     @MockBean
     private UserRepository userRepository;
 
-    @Autowired
-    private HttpSession session;
-
     @BeforeEach
     void setup(){
         User user = new User("Dele", "deee@gmail.com", "123456", Role.ADMIN);
         UserRequestDto request = new UserRequestDto("dele", "123456");
         Mockito.when(userRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword())).thenReturn(user);
-        userService.userLogin(request, session);
+        userService.userLogin(request);
 
         Category category = new Category("1HWB4J2KSJ","Gucci");
-        Mockito.when(categoryRepository.findByUuid("1HWB4J2KSJ")).thenReturn(category);
+        Mockito.when(categoryRepository.findByUuid("1HWB4J2KSJ")).thenReturn(Optional.of(category));
     }
 
     @Test
     void createCategory() {
         CategoryRequestDto request = new CategoryRequestDto("balanciaga");
-        ResponseEntity<ApiResponse> category = categoryService.createCategory(request, session);
+        ResponseEntity<ApiResponse> category = categoryService.createCategory(request);
 
         assertEquals(201, category.getStatusCodeValue());
     }
@@ -66,15 +65,16 @@ class CategoryServiceImplTest {
     @Test
     void updateCategory_success() {
         CategoryRequestDto request = new CategoryRequestDto("new_name");
-        categoryService.updateCategory(request, "1HWB4J2KSJ", session);
-        Category category = categoryRepository.findByUuid("1HWB4J2KSJ");
+        categoryService.updateCategory(request, "1HWB4J2KSJ");
+        Category category = categoryRepository.findByUuid("1HWB4J2KSJ").orElseThrow(() ->
+                new NoDataFoundException("Category does not exist", "Enter a valid category name"));
 
         assertEquals("new_name", category.getName());
     }
 
     @Test
     void deleteCategory() {
-        ResponseEntity<ApiResponse> deletedCategory = categoryService.deleteCategory("1HWB4J2KSJ", session);
+        ResponseEntity<ApiResponse> deletedCategory = categoryService.deleteCategory("1HWB4J2KSJ");
 
         assertEquals(202, deletedCategory.getStatusCodeValue());
     }

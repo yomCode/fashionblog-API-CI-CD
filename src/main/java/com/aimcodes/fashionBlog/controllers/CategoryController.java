@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,19 +16,19 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("/new_category")
-    public ResponseEntity<ApiResponse> newCategory(@RequestBody CategoryRequestDto request, HttpSession session){
-        return categoryService.createCategory(request, session);
+    public ResponseEntity<ApiResponse> newCategory(@RequestBody CategoryRequestDto request){
+        return categoryService.createCategory(request);
     }
 
 
     @PatchMapping("/edit-category/{uuid}")
-    public ResponseEntity<ApiResponse> updateCategory(@RequestBody CategoryRequestDto request, @PathVariable String uuid, HttpSession session){
-        return categoryService.updateCategory(request, uuid, session);
+    public ResponseEntity<ApiResponse> updateCategory(@RequestBody CategoryRequestDto request, @PathVariable String uuid){
+        return categoryService.updateCategory(request, uuid);
     }
 
     @DeleteMapping("/delete_category/{uuid}")
-    public ResponseEntity<ApiResponse> deleteCategory(@PathVariable String uuid, HttpSession session){
-        return categoryService.deleteCategory(uuid, session);
+    public ResponseEntity<ApiResponse> deleteCategory(@PathVariable String uuid){
+        return categoryService.deleteCategory(uuid);
     }
 
     @GetMapping("/categories")

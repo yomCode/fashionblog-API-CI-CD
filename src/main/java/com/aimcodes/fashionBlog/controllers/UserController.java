@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @RestController
@@ -26,14 +25,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(@RequestBody UserRequestDto request, HttpSession session){
+    public ResponseEntity<ApiResponse> login(@RequestBody UserRequestDto request){
 
-        return userService.userLogin(request, session);
+        return userService.userLogin(request);
     }
 
 
     @GetMapping("/logout")
-    public ResponseEntity<ApiResponse> user_logout(HttpSession session){
-        return userService.logout(session);
+    public ResponseEntity<ApiResponse> user_logout(){
+        return userService.logout();
     }
 }

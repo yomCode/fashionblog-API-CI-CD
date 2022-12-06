@@ -6,6 +6,7 @@ import com.aimcodes.fashionBlog.entities.User;
 import com.aimcodes.fashionBlog.enums.Role;
 import com.aimcodes.fashionBlog.exceptions.HandleNullException;
 import com.aimcodes.fashionBlog.exceptions.NoAccessException;
+import com.aimcodes.fashionBlog.exceptions.NoDataFoundException;
 import com.aimcodes.fashionBlog.pojos.ApiResponse;
 import com.aimcodes.fashionBlog.pojos.CommentRequestDto;
 import com.aimcodes.fashionBlog.pojos.CommentResponseDto;
@@ -15,6 +16,7 @@ import com.aimcodes.fashionBlog.services.CommentService;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
 import com.aimcodes.fashionBlog.utils.UuidGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,16 +29,18 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-
+    @Autowired
+    private HttpSession session;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final ResponseManager responseManager;
     private final UuidGenerator uuidGenerator;
 
     @Override
-    public ResponseEntity<ApiResponse> create_comment(CommentRequestDto request, String uuid, HttpSession session){
+    public ResponseEntity<ApiResponse> create_comment(CommentRequestDto request, String uuid){
         User user = (User) session.getAttribute("currUser");
-        Post post = postRepository.findByUuid(uuid);
+        Post post = postRepository.findByUuid(uuid).orElseThrow(()->
+                new NoDataFoundException("No such post", "Post with uuid " + uuid + " does not exist"));
 
         if(user != null){
             String uuidGen = uuidGenerator.generateUuid();
@@ -88,7 +92,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse> deleteComment(String uuid, HttpSession session){
+    public ResponseEntity<ApiResponse> deleteComment(String uuid){
         User user = (User) session.getAttribute("currUser");
         Comment comment = commentRepository.findByUuid(uuid);
 
@@ -121,7 +125,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public ResponseEntity<ApiResponse> view_all_comments(String uuid){
-        Post post = postRepository.findByUuid(uuid);
+        Post post = postRepository.findByUuid(uuid).orElseThrow(()->
+                new NoDataFoundException("No such post", "Post with uuid " + uuid + " does not exist"));
 
         if (post != null) {
             List<Comment> comments = post.getComments();

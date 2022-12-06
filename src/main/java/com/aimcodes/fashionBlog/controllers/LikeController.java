@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/like")
@@ -18,9 +16,9 @@ public class LikeController {
 
 
     @PostMapping("/new/{uuid}")
-    public ResponseEntity<ApiResponse> likeComment(@PathVariable String uuid, HttpSession session){
+    public ResponseEntity<ApiResponse> likeComment(@PathVariable String uuid){
 
-        return likeservice.createLike(uuid, session);
+        return likeservice.createLike(uuid);
     }
 
 
