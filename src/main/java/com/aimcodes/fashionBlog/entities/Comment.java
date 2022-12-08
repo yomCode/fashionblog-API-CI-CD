@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
+@Table(name = "comments")
 public class Comment extends BaseEntity{
 
     @Column(name = "UUID", unique = true)

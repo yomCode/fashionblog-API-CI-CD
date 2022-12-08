@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "categories")
 public class Category extends BaseEntity{
     @Column(name = "UUID", unique = true)
     private String uuid;

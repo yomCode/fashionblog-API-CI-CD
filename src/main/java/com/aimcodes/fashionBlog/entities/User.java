@@ -8,13 +8,13 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name="users")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
 @Builder
+@Table(name = "users")
 public class User extends BaseEntity{
 
     @Column(name = "UUID", unique = true)

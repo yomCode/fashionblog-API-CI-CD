@@ -13,7 +13,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<Post> findByUuid(String uuid);
 
-    @Query(nativeQuery = true, value= "select * from posts where title like %:question% or content like %:question%")
+    @Query(nativeQuery = true, value= "select * from post where title like %:question% or content like %:question%")
     Optional<List<Post>> findBySearch(String question);
 
 }

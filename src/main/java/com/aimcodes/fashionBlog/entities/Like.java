@@ -12,8 +12,8 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "likes")
 @Builder
+@Table(name = "likes")
 public class Like extends BaseEntity{
 
     @Column(name = "UUID", unique = true)

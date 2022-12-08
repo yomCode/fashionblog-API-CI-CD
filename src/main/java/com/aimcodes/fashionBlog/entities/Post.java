@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "posts")
 public class Post extends BaseEntity{
 
     @Column(name = "UUID", unique = true)
