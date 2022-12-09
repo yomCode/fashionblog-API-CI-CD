@@ -38,7 +38,7 @@ jobs:
     - name: Build and push Docker image
       uses: mr-smithers-excellent/docker-build-push@v5
       with:
-        image: aimcodes/fashion-blog-app-v1
+        image: fashionblog-v1
         tags: $BUILD_NUMBER
         registry: docker.io
         dockerfile: Dockerfile
