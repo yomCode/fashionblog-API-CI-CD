@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +61,7 @@ public class UserServiceImpl implements UserService {
 
         if(user != null){
             session.setAttribute("currUser", user);
+            user.setLastLogin(new Date());
             UserResponseDto response = UserResponseDto.builder()
                     .email(user.getEmail())
                     .username(user.getUsername())

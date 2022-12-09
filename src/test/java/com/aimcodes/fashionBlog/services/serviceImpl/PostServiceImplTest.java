@@ -3,13 +3,10 @@
 //import com.aimcodes.fashionBlog.entities.Post;
 //import com.aimcodes.fashionBlog.repositories.UserRepository;
 //import com.aimcodes.fashionBlog.services.PostService;
-//import com.aimcodes.fashionBlog.services.UserService;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.context.SpringBootTest;
 //import org.springframework.boot.test.mock.mockito.MockBean;
-//
-//import static org.junit.jupiter.api.Assertions.*;
 //
 //
 //@SpringBootTest

@@ -3,8 +3,10 @@ package com.aimcodes.fashionBlog.entities;
 import com.aimcodes.fashionBlog.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -32,6 +34,10 @@ public class User extends BaseEntity{
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "last_login")
+    @Nullable
+    private Date lastLogin;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", orphanRemoval = true,fetch = FetchType.EAGER)

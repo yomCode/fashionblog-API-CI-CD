@@ -30,8 +30,6 @@
 //    private ResponseManager responseManager;
 //    @MockBean
 //    private UserRepository userRepository;
-//    @Autowired
-//    private HttpSession session;
 //
 //    @Test
 //    void createUser() {
