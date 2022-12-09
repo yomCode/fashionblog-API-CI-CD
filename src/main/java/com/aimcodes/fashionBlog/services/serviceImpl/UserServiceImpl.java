@@ -9,6 +9,7 @@ import com.aimcodes.fashionBlog.pojos.UserRequestDto;
 import com.aimcodes.fashionBlog.pojos.UserResponseDto;
 import com.aimcodes.fashionBlog.repositories.UserRepository;
 import com.aimcodes.fashionBlog.services.UserService;
+import com.aimcodes.fashionBlog.utils.DataTransfer;
 import com.aimcodes.fashionBlog.utils.ResponseManager;
 import com.aimcodes.fashionBlog.utils.UuidGenerator;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.Date;
 public class UserServiceImpl implements UserService {
     @Autowired
     private HttpSession session;
+    private DataTransfer transfer;
     private final UserRepository userRepository;
     private final UuidGenerator uuidGenerator;
 
