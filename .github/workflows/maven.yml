@@ -49,4 +49,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: rich8rds/fashion-blog-api:latest
+          tags: aimcodes/fashionblog-v1
