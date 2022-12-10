@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
                     .username(request.getUsername().toLowerCase())
                     .email(request.getEmail())
                     .password(request.getPassword())
-                    .role(Role.ADMIN)
+                    .role(Role.USER)
                     .uuid(uuid)
                     .build();
             userRepository.save(user);

@@ -35,4 +35,10 @@ public class UserController {
     public ResponseEntity<ApiResponse> user_logout(){
         return userService.logout();
     }
+
+
+    @GetMapping("/testing")
+    public String testCiCd(){
+        return "CI/CD is working perfectly!";
+    }
 }
